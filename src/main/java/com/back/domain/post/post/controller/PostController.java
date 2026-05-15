@@ -18,12 +18,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+
+    @ModelAttribute("siteName")
+    public String siteName() {
+        return "커뮤니티 사이트 A";
+    }
 
 
 
@@ -31,11 +35,11 @@ public class PostController {
     @AllArgsConstructor
     @Getter
     public static class WriteForm {
-        @NotBlank(message = "01-제목을 입력해주세요.")
-        @Size(min = 2, max = 20, message = "02-제목은 2자 이상, 20자 이하로 입력가능합니다.")
+        @NotBlank(message = "01-title-제목을 입력해주세요.")
+        @Size(min = 2, max = 20, message = "02-title-제목은 2자 이상, 20자 이하로 입력가능합니다.")
         private String title;
-        @NotBlank(message = "03-내용을 입력해주세요.")
-        @Size(min = 2, max = 20, message = "04-내용은 2자 이상, 20자 이하로 입력가능합니다.")
+        @NotBlank(message = "03-content-내용을 입력해주세요.")
+        @Size(min = 2, max = 20, message = "04-content-내용은 2자 이상, 20자 이하로 입력가능합니다.")
         private String content;
     }
 
@@ -52,20 +56,7 @@ public class PostController {
             BindingResult bindingResult,
             Model model
     ) {
-        if (bindingResult.hasErrors()) {
-            String errorFieldName = "title";
-            String errorMessage = bindingResult
-                    .getFieldErrors()
-                    .stream()
-                    .map(FieldError::getDefaultMessage)
-                    .sorted()
-                    .map(message -> message.split("-", 2)[1])
-                    .collect(Collectors.joining("<br>"));
-
-            model.addAttribute("errorMessage", errorMessage);
-
-            return "post/post/write";
-        }
+        if (bindingResult.hasErrors()) return "post/post/write";
 
         Post post = postService.write(form.getTitle(), form.getContent());
 
